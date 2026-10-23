@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hub Créateur</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: une colonne de blocs épais, façon briques, séparés par de gros aplats. Un seul moment fort : le calculateur. */
+:root{
+  --bg:#EDF0F6; --surface:#FFFFFF; --ink:#0D1424; --muted:#55607A; --line:#CBD2E1;
+  --accent:#2750F5; --accent-ink:#FFFFFF; --signal:#FFC22E; --signal-ink:#0D1424; --good:#127A4B; --warn:#B4540A;
+  --f-display:'Bricolage Grotesque','Arial Black',system-ui,sans-serif;
+  --f-body:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0A0F1C; --surface:#131B2E; --ink:#EAEFFA; --muted:#97A3BF; --line:#26314D;
+  --accent:#6F8DFF; --accent-ink:#0A0F1C; --signal:#FFC22E; --signal-ink:#0D1424; --good:#4FD08F; --warn:#FFA05A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A0F1C; --surface:#131B2E; --ink:#EAEFFA; --muted:#97A3BF; --line:#26314D;
+  --accent:#6F8DFF; --accent-ink:#0A0F1C; --signal:#FFC22E; --signal-ink:#0D1424; --good:#4FD08F; --warn:#FFA05A; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--f-body);margin:0;
+  padding-block:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:56px;padding-block:28px 64px}
+h1,h2,h3{font-family:var(--f-display);line-height:1.05;margin:0;text-wrap:balance;letter-spacing:-.02em}
+h1{font-size:clamp(2.4rem,9vw,4.4rem);font-weight:800}
+h2{font-size:clamp(1.7rem,5.5vw,2.4rem);font-weight:800}
+h3{font-size:1.15rem;font-weight:600;letter-spacing:-.01em}
+p{margin:0}
+.label{font:500 .72rem/1 var(--f-mono);text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+nav{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.brand{font:800 1.1rem var(--f-display);display:flex;align-items:center;gap:10px}
+.brand i{width:22px;height:22px;background:var(--accent);display:block;transform:rotate(-8deg);border-radius:3px;box-shadow:5px 5px 0 var(--signal)}
+nav ul{display:flex;gap:4px;list-style:none;margin:0;padding:0;flex-wrap:wrap}
+nav a{display:inline-block;padding:8px 12px;border-radius:999px;color:var(--ink);text-decoration:none;font-weight:500;font-size:.92rem}
+nav a:hover{background:var(--surface)}
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.hero{display:flex;flex-direction:column;gap:22px}
+.hero p.lead{font-size:1.15rem;color:var(--muted);max-width:52ch}
+.hero mark{background:var(--signal);color:var(--signal-ink);padding:0 .15em;border-radius:3px}
+.btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-block;padding:14px 22px;border-radius:10px;font:700 1rem var(--f-body);text-decoration:none;border:2px solid var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.note{font-size:.85rem;color:var(--muted)}
+section{display:flex;flex-direction:column;gap:22px;scroll-margin-top:16px}
+.head{display:flex;flex-direction:column;gap:10px}
+.head p{color:var(--muted);max-width:56ch}
+/* calculateur */
+.calc{background:var(--ink);color:var(--bg);border-radius:20px;padding:clamp(18px,4vw,34px);display:grid;grid-template-columns:1fr 1fr;gap:28px}
+:root[data-theme="dark"] .calc{background:var(--surface);color:var(--ink)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .calc{background:var(--surface);color:var(--ink)}}
+.calc .label{color:inherit;opacity:.65}
+.fields{display:flex;flex-direction:column;gap:18px;min-width:0}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{display:flex;justify-content:space-between;gap:8px;font-weight:500;font-size:.92rem}
+.field output{font-family:var(--f-mono);color:var(--signal)}
+input[type=range]{width:100%;accent-color:var(--signal);height:28px}
+input[type=number]{width:100%;padding:10px 12px;border-radius:8px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:500 1rem var(--f-mono)}
+.result{display:flex;flex-direction:column;gap:14px;justify-content:center;min-width:0}
+.big{font:800 clamp(2.6rem,10vw,4rem)/1 var(--f-display);color:var(--signal);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.rows{display:flex;flex-direction:column;gap:8px;font-size:.92rem}
+.rows div{display:flex;justify-content:space-between;gap:12px;border-top:1px solid color-mix(in srgb,currentColor 22%,transparent);padding-top:8px}
+.rows b{font:500 .95rem var(--f-mono);font-variant-numeric:tabular-nums}
+@media(max-width:640px){.calc{grid-template-columns:1fr}}
+/* idées */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card p{color:var(--muted);font-size:.93rem}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+.tag{font:500 .72rem var(--f-mono);padding:4px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--line)}
+.tag.hot{background:var(--signal);color:var(--signal-ink);border-color:var(--signal)}
+/* audit */
+.audit{display:grid;grid-template-columns:1fr 240px;gap:20px;align-items:start}
+@media(max-width:700px){.audit{grid-template-columns:1fr}}
+.groups{display:flex;flex-direction:column;gap:10px;min-width:0}
+details{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:4px 16px}
+summary{cursor:pointer;font:600 1.05rem var(--f-display);padding:12px 0;display:flex;justify-content:space-between;gap:10px}
+summary span{font:500 .8rem var(--f-mono);color:var(--muted)}
+.check{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.check input{width:22px;height:22px;margin-top:2px;flex:none;accent-color:var(--accent)}
+.check small{display:block;color:var(--muted);font-size:.84rem}
+.score{position:sticky;top:12px;background:var(--surface);border:2px solid var(--ink);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:6px 6px 0 var(--signal)}
+.score .n{font:800 3.2rem/1 var(--f-display);font-variant-numeric:tabular-nums}
+.bar{height:12px;border-radius:99px;background:var(--bg);overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+@media(prefers-reduced-motion:reduce){.bar i{transition:none}}
+/* plan */
+.plan{display:flex;flex-direction:column;gap:10px}
+.week{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:14px 16px}
+.week h3{display:flex;justify-content:space-between;gap:8px;margin-bottom:4px}
+.week h3 span{font:500 .78rem var(--f-mono);color:var(--muted)}
+.next{background:var(--signal);color:var(--signal-ink);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px}
+.next .label{color:inherit;opacity:.7}
+footer{color:var(--muted);font-size:.84rem;border-top:2px solid var(--line);padding-top:18px;display:flex;flex-direction:column;gap:6px}
+</style>
+
+<div class="wrap">
+<nav>
+  <div class="brand"><i></i>Hub Créateur</div>
+  <ul>
+    <li><a href="#revenus">Revenus</a></li>
+    <li><a href="#idees">Idées</a></li>
+    <li><a href="#audit">Audit</a></li>
+    <li><a href="#plan">Plan 30 jours</a></li>
+  </ul>
+</nav>
+
+<header class="hero">
+  <span class="label">Roblox · site · boutique · contenu</span>
+  <h1>Construis ton jeu, puis fais-le <mark>payer</mark>.</h1>
+  <p class="lead">Un seul endroit pour estimer ce que ton jeu Roblox peut rapporter, choisir où gagner de l'argent, auditer ton site et suivre un plan de 30 jours. Rien ici n'est une promesse de gains : tout dépend de tes joueurs.</p>
+  <div class="btns">
+    <a class="btn primary" href="#revenus">Estimer mes revenus</a>
+    <a class="btn ghost" href="#audit">Auditer mon site</a>
+  </div>
+</header>
+
+<section id="revenus">
+  <div class="head">
+    <span class="label">Calculateur</span>
+    <h2>Combien peut rapporter ton jeu ?</h2>
+    <p>Bouge les curseurs. Les valeurs de départ sont des exemples, remplace-les par tes vrais chiffres depuis ton tableau de bord Roblox.</p>
+  </div>
+  <div class="calc">
+    <div class="fields">
+      <div class="field"><label for="players">Joueurs par jour <output id="o-players"></output></label>
+        <input id="players" type="range" min="10" max="20000" step="10" value="500"></div>
+      <div class="field"><label for="conv">Joueurs qui achètent <output id="o-conv"></output></label>
+        <input id="conv" type="range" min="0.5" max="15" step="0.5" value="3"></div>
+      <div class="field"><label for="price">Dépense moyenne (Robux) <output id="o-price"></output></label>
+        <input id="price" type="range" min="25" max="2000" step="25" value="150"></div>
+      <div class="field"><label for="rate">Valeur d'un Robux en dollars</label>
+        <input id="rate" type="number" step="0.0001" min="0" value="0.0035">
+        <span class="note" style="color:inherit;opacity:.65">Taux d'échange de départ. Vérifie le taux officiel actuel avant de t'y fier.</span></div>
+    </div>
+    <div class="result">
+      <span class="label">Estimation par mois</span>
+      <div class="big" id="usd">0 $</div>
+      <div class="rows">
+        <div><span>Robux gagnés (après 30 % de frais)</span><b id="robux">0</b></div>
+        <div><span>Acheteurs par jour</span><b id="buyers">0</b></div>
+        <div><span>Par an, au même rythme</span><b id="year">0 $</b></div>
+        <div><span>Joueurs/jour pour atteindre 100 $/mois</span><b id="need">0</b></div>
+      </div>
+    </div>
+  </div>
+  <p class="note">Le calcul : joueurs × 30 jours × part d'acheteurs × dépense moyenne × 0,70. Le retrait en argent réel demande un minimum de Robux et un compte éligible, à vérifier sur Roblox.</p>
+</section>
+
+<section id="idees">
+  <div class="head">
+    <span class="label">Sources de revenus</span>
+    <h2>Où gagner de l'argent</h2>
+    <p>Classées par ce qui est réaliste quand on démarre depuis un iPad, sans budget.</p>
+  </div>
+  <div class="grid">
+    <article class="card"><h3>Passes de jeu</h3><p>Un achat unique qui donne un avantage : double vitesse, zone VIP, skin. Le plus simple à mettre en place.</p><div class="tags"><span class="tag hot">Départ idéal</span><span class="tag">Gratuit</span></div></article>
+    <article class="card"><h3>Achats répétables</h3><p>Pièces, boosts, caisses cosmétiques. Rapporte plus quand les joueurs reviennent chaque jour.</p><div class="tags"><span class="tag hot">Meilleur potentiel</span><span class="tag">Gratuit</span></div></article>
+    <article class="card"><h3>Revenus Premium</h3><p>Roblox te reverse une part selon le temps que passent les abonnés Premium dans ton jeu.</p><div class="tags"><span class="tag">Passif</span><span class="tag">Gratuit</span></div></article>
+    <article class="card"><h3>Services pour autres créateurs</h3><p>Vendre des scripts, des maps ou des interfaces à d'autres développeurs, ou faire des commandes sur mesure.</p><div class="tags"><span class="tag">Rapide</span><span class="tag">Demande des portfolios</span></div></article>
+    <article class="card"><h3>Vidéos et guides</h3><p>Trucs, codes et astuces de ton jeu sur YouTube ou TikTok. Ramène des joueurs gratuitement.</p><div class="tags"><span class="tag">Croissance</span><span class="tag">Régulier</span></div></article>
+    <article class="card"><h3>Pubs et affiliation</h3><p>Pour ton site : bannières, liens affiliés vers du matériel ou des outils. Il faut du trafic d'abord.</p><div class="tags"><span class="tag">Long terme</span><span class="tag">Trafic requis</span></div></article>
+  </div>
+</section>
+
+<section id="audit">
+  <div class="head">
+    <span class="label">Améliorer un site</span>
+    <h2>Audit de ton site en 20 points</h2>
+    <p>Coche ce que ton site fait déjà. Le score monte, et ce qui reste décoché est ta liste de travail. Tes réponses restent sur cet appareil.</p>
+  </div>
+  <div class="audit">
+    <div class="groups" id="groups"></div>
+    <aside class="score">
+      <span class="label">Score</span>
+      <div class="n"><span id="sc">0</span><small style="font-size:1.1rem"> / 100</small></div>
+      <div class="bar"><i id="scbar"></i></div>
+      <p id="scmsg" class="note"></p>
+      <button class="btn ghost" id="reset" type="button" style="padding:10px 14px">Tout décocher</button>
+    </aside>
+  </div>
+</section>
+
+<section id="plan">
+  <div class="head">
+    <span class="label">Plan</span>
+    <h2>Les 30 prochains jours</h2>
+    <p>Quatre semaines, une cible par semaine. Coche au fur et à mesure.</p>
+  </div>
+  <div class="plan" id="weeks"></div>
+  <div class="next">
+    <span class="label">Première action</span>
+    <h3>Ajoute un passe de jeu à 100 Robux dans ton jeu aujourd'hui.</h3>
+    <p>Tant qu'il n'y a rien à acheter, le calculateur ci-dessus reste à zéro.</p>
+  </div>
+</section>
+
+<footer>
+  <span>Les chiffres du calculateur sont des exemples à remplacer par les tiens. Les taux et règles de Roblox changent : vérifie-les sur la documentation officielle.</span>
+  <span>Cette page est une base. Dis-moi le nom de ton jeu et je la personnalise.</span>
+</footer>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var store={get:function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+             set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+  function fmt(n,d){return n.toLocaleString('fr-FR',{maximumFractionDigits:d||0})}
+  /* calculateur */
+  var ids=['players','conv','price','rate'];
+  function calc(){
+    var p=+$('players').value,c=+$('conv').value/100,pr=+$('price').value,r=+$('rate').value||0;
+    $('o-players').textContent=fmt(p);$('o-conv').textContent=fmt(+$('conv').value,1)+' %';$('o-price').textContent=fmt(pr)+' R$';
+    var buyers=p*c,robux=buyers*pr*30*0.7,usd=robux*r;
+    $('usd').textContent=fmt(usd)+' $';$('robux').textContent=fmt(robux)+' R$';
+    $('buyers').textContent=fmt(buyers,1);$('year').textContent=fmt(usd*12)+' $';
+    var perPlayer=c*pr*30*0.7*r;
+    $('need').textContent=perPlayer>0?fmt(Math.ceil(100/perPlayer)):'—';
+  }
+  ids.forEach(function(i){$(i).addEventListener('input',calc)});calc();
+  /* audit */
+  var AUDIT=[
+    ['Vitesse',[['Chargement sous 3 secondes sur mobile','Teste avec PageSpeed Insights.'],['Images compressées','Format WebP, pas de photo de 5 Mo.'],['Pas de pop-up au chargement','Ça fait fuir avant la première lecture.'],['Fonctionne bien sur téléphone','Boutons assez grands, texte lisible sans zoomer.']]],
+    ['Contenu',[['Une phrase claire en haut de page','On comprend le jeu ou l\'offre en 5 secondes.'],['Un bouton principal unique','Jouer, acheter ou s\'inscrire, pas trois choses à la fois.'],['Captures ou vidéo du jeu','Les vraies images donnent confiance.'],['Page de questions fréquentes','Réduit les messages répétitifs.']]],
+    ['Revenus',[['Lien direct vers le jeu ou la boutique','À un clic depuis chaque page.'],['Offres visibles avec leur prix','Passes, packs ou services listés clairement.'],['Collecte d\'e-mails ou lien Discord','Pour garder les joueurs entre deux mises à jour.'],['Liens affiliés signalés comme tels','C\'est une obligation de transparence.']]],
+    ['Visibilité',[['Titre et description par page','Ce que Google affiche dans les résultats.'],['Titres bien hiérarchisés','Un seul titre principal, puis des sous-titres.'],['Texte alternatif sur les images','Aide l\'accessibilité et le référencement.'],['Partage propre sur les réseaux','Image et titre corrects quand on colle le lien.']]],
+    ['Confiance',[['Page de contact ou Discord actif','On sait comment te joindre.'],['Mentions légales et confidentialité','Surtout si tu collectes des e-mails.'],['Message adapté aux jeunes joueurs','Pas de collecte de données sur les mineurs sans cadre.'],['Aucun lien cassé','Clique sur chaque lien une fois.']]]
+  ];
+  var saved=store.get('audit',{});var total=0;
+  var g=$('groups');
+  AUDIT.forEach(function(grp,gi){
+    var d=document.createElement('details');if(gi===0)d.open=true;
+    var s=document.createElement('summary');var cnt=document.createElement('span');
+    s.appendChild(document.createTextNode(grp[0]));s.appendChild(cnt);d.appendChild(s);
+    grp[1].forEach(function(it,ii){
+      total++;var key=gi+'-'+ii;
+      var l=document.createElement('label');l.className='check';
+      var cb=document.createElement('input');cb.type='checkbox';cb.id='a'+key;cb.checked=!!saved[key];
+      cb.addEventListener('change',function(){saved[key]=cb.checked;store.set('audit',saved);score()});
+      var t=document.createElement('span');var b=document.createElement('b');b.textContent=it[0];
+      var sm=document.createElement('small');sm.textContent=it[1];t.appendChild(b);t.appendChild(sm);
+      l.appendChild(cb);l.appendChild(t);d.appendChild(l);
+    });
+    d._cnt=cnt;d._gi=gi;g.appendChild(d);
+  });
+  function score(){
+    var done=0;
+    Array.prototype.forEach.call(g.children,function(d){
+      var n=0;AUDIT[d._gi][1].forEach(function(_,ii){if(saved[d._gi+'-'+ii])n++});done+=n;d._cnt.textContent=n+'/'+AUDIT[d._gi][1].length;
+    });
+    var pct=Math.round(done/total*100);
+    $('sc').textContent=pct;$('scbar').style.width=pct+'%';
+    $('scmsg').textContent=pct>=80?'Site solide. Il reste des détails à polir.':pct>=40?'Bonne base. Coche les points de la catégorie Revenus en premier.':'Beaucoup de gains faciles. Commence par la vitesse et un bouton principal.';
+  }
+  $('reset').addEventListener('click',function(){saved={};store.set('audit',saved);Array.prototype.forEach.call(g.querySelectorAll('input'),function(c){c.checked=false});score()});
+  score();
+  /* plan */
+  var PLAN=[
+    ['Semaine 1','Mettre en vente',['Ajouter 1 passe de jeu','Ajouter 1 achat répétable','Vérifier que l\'achat marche sur téléphone']],
+    ['Semaine 2','Faire venir des joueurs',['Créer une miniature et un titre accrocheurs','Poster 3 courtes vidéos du jeu','Créer un serveur Discord ou une page de suivi']],
+    ['Semaine 3','Garder les joueurs',['Publier une mise à jour avec une récompense quotidienne','Lire les retours et corriger 3 bugs','Ajouter un événement limité dans le temps']],
+    ['Semaine 4','Mesurer et ajuster',['Noter joueurs, acheteurs et dépense moyenne','Remplacer les valeurs du calculateur par les vraies','Passer l\'audit du site et corriger 5 points']]
+  ];
+  var ps=store.get('plan',{});var w=$('weeks');
+  PLAN.forEach(function(wk,wi){
+    var box=document.createElement('div');box.className='week';
+    var h=document.createElement('h3');h.appendChild(document.createTextNode(wk[1]));var sp=document.createElement('span');h.appendChild(sp);box.appendChild(h);
+    function upd(){var n=0;wk[2].forEach(function(_,i){if(ps[wi+'-'+i])n++});sp.textContent=wk[0]+' · '+n+'/'+wk[2].length}
+    wk[2].forEach(function(t,i){
+      var k=wi+'-'+i;var l=document.createElement('label');l.className='check';
+      var cb=document.createElement('input');cb.type='checkbox';cb.id='p'+k;cb.checked=!!ps[k];
+      cb.addEventListener('change',function(){ps[k]=cb.checked;store.set('plan',ps);upd()});
+      var s=document.createElement('span');s.textContent=t;l.appendChild(cb);l.appendChild(s);box.appendChild(l);
+    });
+    upd();w.appendChild(box);
+  });
+})();
+</script>
+
+</html>
